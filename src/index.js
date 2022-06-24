@@ -105,6 +105,25 @@ app.post('/withdraw', verifyIfExistsAccountCpf, (req, res) => {
     return res.status(201).json(statementOperation)
 })
 
+app.get('/statement/date', verifyIfExistsAccountCpf, (req, res) => {
+    const { customer } = req
+    const { date } = req.query
+
+    const dateFormat = new Date(date + ' 00:00')
+
+    const statement = customer.statement.filter(
+        (transaction) =>
+            transaction.created_at.toDateString() ===
+            new Date(dateFormat).toDateString()
+    )
+
+    if (!statement.length) {
+        return res.status(400).json({ error: 'Statement not found' })
+    }
+
+    return res.json(statement)
+})
+
 app.listen(3333, () => {
     console.log('Server is running on port 3333')
 })
